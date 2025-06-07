@@ -1,44 +1,22 @@
-name: Sync HTB Writeups
+title: "HTB Writeups"
+description: "Writeups for Hack The Box machines"
+author: "DilipK5"
+email: "you@example.com"
+baseurl: ""  # Leave this empty if deploying to username.github.io
+url: "https://dilipk5.github.io/HTB-blog"
 
-on:
-  workflow_dispatch:
-  schedule:
-    - cron: '0 * * * *'
+theme: minima
 
-jobs:
-  sync:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout Blog Repo
-        uses: actions/checkout@v3
+plugins:
+  - jekyll-feed
+  - jekyll-seo-tag
 
-      - name: Checkout HTB Labs Repo
-        uses: actions/checkout@v3
-        with:
-          repository: dilipk5/htb-labs
-          token: ${{ secrets.GH_PAT }}
-          path: htb-labs
+markdown: kramdown
 
-      - name: Copy and Format HTB Writeups
-        run: |
-          mkdir -p _posts/htb
-          rm -rf _posts/htb/*
-          for file in htb-labs/*.md; do
-            filename=$(basename "$file" .md)
-            today=$(date +%F)
-            newfile="_posts/htb/${today}-${filename}.md"
-            echo "---" > "$newfile"
-            echo "title: \"$filename\"" >> "$newfile"
-            echo "date: $(date +%Y-%m-%d)" >> "$newfile"
-            echo "tags: [htb]" >> "$newfile"
-            echo "---" >> "$newfile"
-            cat "$file" >> "$newfile"
-          done
+future: true  # Allows future-dated posts to be shown
+show_excerpts: true
 
-      - name: Commit and Push
-        run: |
-          git config --global user.name "HTB Sync Bot"
-          git config --global user.email "htb-sync@users.noreply.github.com"
-          git add .
-          git commit -m "Auto-sync HTB writeups" || echo "Nothing to commit"
-          git push https://x-access-token:${{ secrets.GH_PAT }}@github.com/dilipk5/HTB-blog.git HEAD:main
+# Optional: If using tags/categories
+collections:
+  posts:
+    output: true
