@@ -1,0 +1,48 @@
+name: Sync HTB Writeups
+
+on:
+  push:
+    branches: [master]
+  schedule:
+    - cron: '0 * * * *'  # every hour
+  workflow_dispatch:
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Blog Repo
+        uses: actions/checkout@v3
+
+      - name: Checkout HTB Labs Repo
+        uses: actions/checkout@v3
+        with:
+          repository: dilipk5/HTB-Labs
+          path: htb-labs
+
+      - name: Copy and Format HTB Writeups
+        run: |
+          mkdir -p _posts/htb
+          rm -rf _posts/htb/*
+          for file in htb-labs/*.md; do
+            filename=$(basename "$file")
+            today=$(date +%F)
+            {
+              echo "---"
+              echo "title: \"${filename%.md}\""
+              echo "date: $today"
+              echo "categories: [HTB, Writeups]"
+              echo "tags: [htb, writeup]"
+              echo "---"
+              echo
+              cat "$file"
+            } > "_posts/htb/${today}-${filename}"
+          done
+
+      - name: Commit and Push
+        run: |
+          git config user.name "GitHub Actions"
+          git config user.email "actions@github.com"
+          git add .
+          git commit -m "Auto-sync HTB writeups" || echo "No changes"
+          git push
