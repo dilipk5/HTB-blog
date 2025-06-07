@@ -22,22 +22,15 @@ jobs:
 
       - name: Copy and Format HTB Writeups
         run: |
-          mkdir -p _posts/htb
-          rm -rf _posts/htb/*
+          mkdir -p _posts
+          rm -rf _posts/*
           for file in htb-labs/*.md; do
-            filename=$(basename "$file")
+            filename=$(basename "$file" .md)
             today=$(date +%F)
-            {
-              echo "---"
-              echo "title: \"${filename%.md}\""
-              echo "date: $today"
-              echo "categories: [HTB, Writeups]"
-              echo "tags: [htb, writeup]"
-              echo "---"
-              echo
-              cat "$file"
-            } > "_posts/htb/${today}-${filename}"
+            newfile="_posts/${today}-${filename}.md"
+            # add frontmatter & copy file content
           done
+
 
       - name: Commit and Push
         run: |
