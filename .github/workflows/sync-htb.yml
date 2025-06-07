@@ -3,7 +3,7 @@ name: Sync HTB Writeups
 on:
   workflow_dispatch:
   schedule:
-    - cron: '0 * * * *'   # runs every hour
+    - cron: '0 * * * *'   # every hour
 
 jobs:
   sync:
@@ -13,18 +13,18 @@ jobs:
       - name: Checkout Blog Repo
         uses: actions/checkout@v3
 
-      - name: Checkout HTB Labs Repo
+      - name: Checkout HTB-Labs Repo
         uses: actions/checkout@v3
         with:
-          repository: dilipk5/HTB-Labs    # exact repo name with caps
-          token: ${{ secrets.GH_PAT }}    # your PAT stored in secrets
-          path: htb-labs                  # local folder to checkout
+          repository: dilipk5/HTB-Labs
+          token: ${{ secrets.GH_PAT }}
+          path: HTB-Labs
 
       - name: Copy and Format HTB Writeups
         run: |
           mkdir -p _posts
           rm -rf _posts/*
-          for file in htb-labs/*.md; do
+          for file in HTB-Labs/*.md; do
             filename=$(basename "$file" .md)
             today=$(date +%F)
             newfile="_posts/${today}-${filename}.md"
@@ -36,7 +36,7 @@ jobs:
             cat "$file" >> "$newfile"
           done
 
-      - name: Commit and Push
+      - name: Commit and Push Changes
         run: |
           git config --global user.name "HTB Sync Bot"
           git config --global user.email "htb-sync@users.noreply.github.com"
